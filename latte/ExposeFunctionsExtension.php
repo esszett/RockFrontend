@@ -45,7 +45,10 @@ final class ExposeFunctionsExtension extends Extension
     $result = [];
     foreach ($functions as $function) {
       if (!str_starts_with($function, 'processwire\\')) continue;
-      $name = str_replace('processwire\\', '', $function);
+      // get_defined_functions() returns lowercased names, but Latte
+      // matches registered functions case-sensitively at compile time,
+      // so the declared function name must be recovered via reflection
+      $name = (new \ReflectionFunction($function))->getShortName();
       $result[$name] = $function;
     }
     return $result;
